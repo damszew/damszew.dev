@@ -27,3 +27,4 @@ List of articles that had great impact on my software development
 - ["Test-induced design damage" by David Heinemeier Hansson](https://dhh.dk/2014/test-induced-design-damage.html)
 - ["Slow database test fallacy" by David Heinemeier Hansson](https://dhh.dk/2014/slow-database-test-fallacy.html)
 - ["Impureim sandwich" by Mark Seemann](https://blog.ploeh.dk/2020/03/02/impureim-sandwich/)
+- ["The LOGAF Scale" by Dan Lew](https://blog.danlew.net/2020/04/15/the-logaf-scale/)

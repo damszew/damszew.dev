@@ -10,6 +10,11 @@ in
   };
   config = mkIf (cfg.enable) {
     services.caddy.virtualHosts."damszew.dev" = {
+      serverAliases = [
+        "www.damszew.dev"
+        "mail.damszew.dev"
+      ];
+
       extraConfig = ''
         root * /var/www/damszew-dev
         file_server
