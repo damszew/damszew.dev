@@ -55,7 +55,6 @@
               rm -rf /var/www/damszew-dev
               mkdir -p /var/www/damszew-dev
               cp -R ${damszew-dev}/* /var/www/damszew-dev/
-              systemctl reload caddy.service
             '';
           in
           {
@@ -84,9 +83,6 @@
         )
       )
       {
-        nixosModules = { default = import ./module.nix inputs; };
-
-
         # nix run github:serokell/deploy-rs .
         deploy = {
           magicRollback = true;
