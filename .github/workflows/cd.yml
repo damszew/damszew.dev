@@ -8,6 +8,9 @@ name: CD
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: 📂 setup
         uses: actions/checkout@v4
@@ -28,34 +31,20 @@ jobs:
         #   with:
         #     fail-mode: true
 
-      - name: Flake check 🕵️
+      - name: Flake check ❄️
         run: nix flake check --print-build-logs
-      - name: Check deploy schema 📐
-        run: nix build -L .#checks.x86_64-linux.deploy-schema
-        if: success() || failure()
-      - name: Check deploy activate 💪🏻
-        run: nix build -L .#checks.x86_64-linux.deploy-activate
 
-      - name: Setup secrets 🤫
-        uses: 1password/load-secrets-action@v1
-        id: op-load-secret # required so other steps can access secrets
-        with:
-          export-env: false
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          PERUN_IP: op://damszew.dev/Perun/URL
-          SSH_PRIVATE_KEY: op://damszew.dev/deploy_ssh_key/private key?ssh-format=openssh
-
-      - name: Add perun to hosts ⚡
-        run: sudo echo "${{ steps.op-load-secret.outputs.PERUN_IP }} perun" | sudo tee -a /etc/hosts
-      - name: Setup ssh key 🔐
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ steps.op-load-secret.outputs.SSH_PRIVATE_KEY }}
-      - name: Setup ssh/known_hosts 💁
+      - name: Docker build 🐋
         run: |
-          mkdir -p ~/.ssh && touch ~/.ssh/known_hosts
-          ssh-keyscan perun >> ~/.ssh/known_hosts
+          nix build .#dockerImage
+          ./result | docker load
 
-      - name: deploy 
-        run: nix develop -c deploy --skip-checks # checks are performed earlier in pipeline
+      - name: Login to Docker Registry 🔐
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image to registry 💪🏻
+        run: docker push ghcr.io/damszew/damszew-dev:latest
