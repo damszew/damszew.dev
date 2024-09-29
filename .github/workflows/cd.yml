@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: 📂 setup
         uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
       - name: Check 🕵️
         uses: shalzz/zola-deploy-action@v0.18.0
         env:
@@ -32,11 +34,11 @@ jobs:
         #     fail-mode: true
 
       - name: Flake check ❄️
-        run: nix flake check --print-build-logs
+        run: nix flake check "git+file://$(pwd)?submodules=1" --print-build-logs
 
       - name: Docker build 🐋
         run: |
-          nix build .#dockerImage
+          nix build "git+file://$(pwd)?submodules=1#dockerImage"
           ./result | docker load
 
       - name: Login to Docker Registry 🔐
